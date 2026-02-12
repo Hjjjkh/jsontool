@@ -6,6 +6,7 @@ interface EditorProps {
   readOnly?: boolean;
   placeholder?: string;
   className?: string;
+  ariaLabel?: string;
 }
 
 export const Editor: React.FC<EditorProps> = ({
@@ -14,6 +15,7 @@ export const Editor: React.FC<EditorProps> = ({
   readOnly = false,
   placeholder = '请输入 JSON 数据...',
   className = '',
+  ariaLabel = 'JSON 编辑器',
 }) => {
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -31,6 +33,7 @@ export const Editor: React.FC<EditorProps> = ({
         placeholder={placeholder}
         className="editor-textarea"
         spellCheck={false}
+        aria-label={ariaLabel}
       />
     </div>
   );

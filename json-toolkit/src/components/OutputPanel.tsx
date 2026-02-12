@@ -6,13 +6,17 @@ interface OutputPanelProps {
   loading?: boolean;
 }
 
-export const OutputPanel: React.FC<OutputPanelProps> = ({ value, error, loading = false }) => {
+export const OutputPanel: React.FC<OutputPanelProps> = ({
+  value,
+  error,
+  loading = false,
+}) => {
   return (
-    <div className="output-panel">
+    <div className="output-panel" role="status" aria-live="polite">
       {loading ? (
         <div className="loading-state">处理中...</div>
       ) : error ? (
-        <div className="error-state">{error}</div>
+        <div className="error-state" role="alert">{error}</div>
       ) : value ? (
         <pre className="output-content">{value}</pre>
       ) : (

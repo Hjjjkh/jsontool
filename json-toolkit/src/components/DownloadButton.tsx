@@ -4,12 +4,14 @@ interface DownloadButtonProps {
   content: string;
   filename?: string;
   className?: string;
+  ariaLabel?: string;
 }
 
 export const DownloadButton: React.FC<DownloadButtonProps> = ({
   content,
   filename = 'output.json',
   className = '',
+  ariaLabel = '下载文件',
 }) => {
   const handleDownload = () => {
     const blob = new Blob([content], { type: 'application/json' });
@@ -24,7 +26,13 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
   };
 
   return (
-    <button onClick={handleDownload} disabled={!content} className={`download-button ${className}`}>
+    <button
+      onClick={handleDownload}
+      disabled={!content}
+      className={`download-button ${className}`}
+      type="button"
+      aria-label={ariaLabel}
+    >
       下载
     </button>
   );

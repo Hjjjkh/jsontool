@@ -9,7 +9,7 @@ interface ToolTabsProps {
 
 export const ToolTabs: React.FC<ToolTabsProps> = ({ activeTool, onToolChange }) => {
   return (
-    <div className="tool-tabs">
+    <nav className="tool-tabs" aria-label="工具选择">
       {TOOL_CATEGORIES.map((category) => (
         <div key={category.id} className="tool-category">
           <h3 className="category-title">{category.label}</h3>
@@ -20,6 +20,7 @@ export const ToolTabs: React.FC<ToolTabsProps> = ({ activeTool, onToolChange }) 
                 onClick={() => onToolChange(item.type)}
                 className={`tool-button ${activeTool === item.type ? 'active' : ''}`}
                 title={item.description}
+                type="button"
               >
                 {item.label}
               </button>
@@ -27,6 +28,6 @@ export const ToolTabs: React.FC<ToolTabsProps> = ({ activeTool, onToolChange }) 
           </div>
         </div>
       ))}
-    </div>
+    </nav>
   );
 };

@@ -37,39 +37,53 @@ const App: React.FC = () => {
     <div className="app">
       <header className="app-header">
         <h1>JSON 工具站</h1>
-        <p className="subtitle">工程化的 JSON 处理工具</p>
+        <p className="subtitle">专业的 JSON 处理工具 - 格式化、压缩、转换、校验一站式解决方案</p>
       </header>
 
       <main className="app-main">
-        <div className="editor-section">
+        <section className="editor-section" aria-labelledby="input-heading">
           <div className="section-header">
-            <h2>输入</h2>
+            <h2 id="input-heading">输入</h2>
             <div className="action-buttons">
-              <button onClick={handleClear} className="clear-button">
+              <button onClick={handleClear} className="clear-button" type="button">
                 清空
               </button>
             </div>
           </div>
-          <Editor value={inputJSON} onChange={setInputJSON} placeholder="请输入 JSON 数据..." />
-        </div>
+          <Editor
+            value={inputJSON}
+            onChange={setInputJSON}
+            placeholder="请输入或粘贴 JSON 数据..."
+            aria-label="JSON 输入区域"
+          />
+        </section>
 
-        <div className="tools-section">
-          <ToolTabs activeTool={activeTool as any} onToolChange={handleToolChange} />
+        <section className="tools-section" aria-labelledby="tools-heading">
+          <ToolTabs
+            activeTool={activeTool as any}
+            onToolChange={handleToolChange}
+          />
           <button
             onClick={handleExecute}
             disabled={isExecuting || !inputJSON}
             className="execute-button"
+            type="button"
+            aria-live="polite"
           >
             {isExecuting ? '处理中...' : '执行'}
           </button>
-        </div>
+        </section>
 
-        <div className="output-section">
+        <section className="output-section" aria-labelledby="output-heading">
           <div className="section-header">
-            <h2>输出</h2>
+            <h2 id="output-heading">输出</h2>
             <div className="action-buttons">
-              <CopyButton text={outputResult} />
-              <DownloadButton content={outputResult} />
+              <CopyButton text={outputResult} aria-label="复制输出结果" />
+              <DownloadButton
+                content={outputResult}
+                filename="output.json"
+                aria-label="下载输出结果"
+              />
             </div>
           </div>
           <OutputPanel
@@ -77,11 +91,11 @@ const App: React.FC = () => {
             error={errorState?.message || null}
             loading={isExecuting}
           />
-        </div>
+        </section>
       </main>
 
       <footer className="app-footer">
-        <p>基于 React + TypeScript + Vite 构建</p>
+        <p>基于 React + TypeScript + Vite 构建 · 专业开发工具</p>
       </footer>
     </div>
   );
