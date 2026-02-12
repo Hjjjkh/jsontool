@@ -1,7 +1,16 @@
 import type { JSONTool, ToolResult, JSONValue, ToolType } from '../types';
 import { FormatTool, MinifyTool, ValidateTool, SortKeysTool } from './basicTools';
+import {
+  RemoveUndefinedTool,
+  DeepArrayDeduplicateTool,
+  DiffTool,
+  MergeTool,
+} from './basicAdditionalTools';
 import { FlattenTool, UnflattenTool, RemoveNullTool, RemoveEmptyStringTool } from './dataStructureTools';
 import { ToTypeScriptTool, ToJavaTool, ToGoTool } from './conversionTools';
+import { ToPythonTool, ToSchemaTool } from './conversionAdditionalTools';
+import { JsonPathTool, SearchKeyTool, SearchValueTool } from './queryTools';
+import { MaskFieldsTool, DeleteFieldsTool } from './securityTools';
 
 class ToolRegistry {
   private tools: Map<ToolType, JSONTool> = new Map();
@@ -16,13 +25,24 @@ class ToolRegistry {
       new MinifyTool(),
       new ValidateTool(),
       new SortKeysTool(),
+      new RemoveUndefinedTool(),
+      new DeepArrayDeduplicateTool(),
       new FlattenTool(),
       new UnflattenTool(),
       new RemoveNullTool(),
       new RemoveEmptyStringTool(),
+      new DiffTool(),
+      new MergeTool(),
       new ToTypeScriptTool(),
       new ToJavaTool(),
       new ToGoTool(),
+      new ToPythonTool(),
+      new ToSchemaTool(),
+      new JsonPathTool(),
+      new SearchKeyTool(),
+      new SearchValueTool(),
+      new MaskFieldsTool(),
+      new DeleteFieldsTool(),
     ];
 
     for (const tool of tools) {
