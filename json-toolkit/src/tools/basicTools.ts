@@ -1,4 +1,4 @@
-import type { JSONValue, JSONTool, ToolResult, ErrorInfo } from '../types';
+import type { JSONValue, JSONTool, ToolResult } from '../types';
 import { stringifyJSON, stringifyMinified, createErrorResult, createSuccessResult } from '../utils/jsonHelper';
 
 export class FormatTool implements JSONTool {
@@ -52,12 +52,16 @@ export class ValidateTool implements JSONTool {
     }
   }
 
-  private parseError(error: unknown): ErrorInfo {
+  private parseError(error: unknown): { message: string } {
     if (error instanceof SyntaxError) {
       const message = error.message;
-      return {
-        message: `JSON 语法错误: ${message}`,
-      };
+      const match = message.match(/position (\d+)/);
+      if (match) {
+        const position = parseInt(match[1], 10);
+        return {
+          message: `JSON 语法错误: 位置 ${position}`,
+        };
+      }
     }
     return {
       message: error instanceof Error ? error.message : '未知错误',
@@ -89,14 +93,14 @@ export class SortKeysTool implements JSONTool {
       return value.map((item) => this.sortObjectKeys(item, order));
     }
 
+    const keys = Object.keys(value);
     const sorted: Record<string, JSONValue> = {};
-    const keys = Object.keys(value).sort((a, b) => {
-      if (order === 'asc') {
-        return a.localeCompare(b);
-      } else {
-        return b.localeCompare(a);
-      }
-    });
+
+    if (order === 'asc') {
+      keys.sort((a, b) => a.localeCompare(b));
+    } else {
+      keys.sort((a, b) => b.localeCompare(a));
+    }
 
     for (const key of keys) {
       sorted[key] = this.sortObjectKeys(value[key], order);

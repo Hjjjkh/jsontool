@@ -1,0 +1,22 @@
+{
+  "name": "测试用户",
+  "age": 25,
+  "email": "test@example.com",
+  "phone": "13812345678",
+  "address": {
+    "city": "北京",
+    "district": "朝阳区",
+    "street": "长安街"
+  },
+  "hobbies": ["编程", "阅读", "编程"],
+  "metadata": {
+    "id": "1234567890123456",
+    "token": "secret_token_abc123",
+    "password": "mypassword123",
+    "nullField": null,
+    "emptyString": ""
+  },
+  "scores": [90, 85, 95],
+  "active": true,
+  "undefinedField": null
+}
