@@ -251,13 +251,19 @@ export class MergeTool implements JSONTool {
     }
 
     if (isObject(source)) {
+      const sourceObj = source as Record<string, JSONValue>;
       const result: Record<string, JSONValue> = { ...(isObject(target) ? (target as Record<string, JSONValue>) : {}) };
 
-      for (const key of Object.keys(source as Record<string, JSONValue>)) {
-        const sourceValue = source[key];
+      for (const key of Object.keys(sourceObj)) {
+        const sourceValue = sourceObj[key];
 
-        if (isObject(sourceValue) && isObject((result[key] as JSONValue))) {
-          result[key] = this.deepMerge((result[key] as JSONValue), sourceValue);
+        if (isObject(sourceValue)) {
+          const targetValue = result[key];
+          if (isObject(targetValue)) {
+            result[key] = this.deepMerge(targetValue, sourceValue);
+          } else {
+            result[key] = sourceValue;
+          }
         } else {
           result[key] = sourceValue;
         }
