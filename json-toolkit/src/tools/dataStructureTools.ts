@@ -39,7 +39,7 @@ export class FlattenTool implements JSONTool {
 
     for (const key of Object.keys(value)) {
       const newKey = prefix ? `${prefix}${separator}${key}` : key;
-      const item = value[key];
+      const item = (value as Record<string, JSONValue>)[key];
 
       if (isObject(item) || isArray(item)) {
         Object.assign(result, this.flattenObject(item, separator, newKey));

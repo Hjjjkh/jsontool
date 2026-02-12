@@ -26,10 +26,11 @@ export class RemoveUndefinedTool implements JSONTool {
     }
 
     if (isObject(value)) {
+      const objValue = value as Record<string, JSONValue>;
       const result: Record<string, JSONValue> = {};
 
-      for (const key of Object.keys(value)) {
-        const item = value[key];
+      for (const key of Object.keys(objValue)) {
+        const item = objValue[key];
 
         if (item === undefined) {
           continue;
@@ -83,10 +84,11 @@ export class DeepArrayDeduplicateTool implements JSONTool {
     }
 
     if (isObject(value)) {
+      const objValue = value as Record<string, JSONValue>;
       const result: Record<string, JSONValue> = {};
 
-      for (const key of Object.keys(value)) {
-        result[key] = this.deepDeduplicate(value[key]);
+      for (const key of Object.keys(objValue)) {
+        result[key] = this.deepDeduplicate(objValue[key]);
       }
 
       return result;
@@ -124,13 +126,13 @@ export class DiffTool implements JSONTool {
 
   private computeDiff(a: JSONValue, b: JSONValue, path: string = ''): Record<string, unknown> {
     if (deepEqual(a, b)) {
-      return { unchanged: true };
+      return { path, type: 'unchanged' };
     }
 
     if (typeof a !== typeof b) {
       return {
-        type: 'type_mismatch',
         path,
+        type: 'type_mismatch',
         oldValue: a,
         newValue: b,
       };
@@ -138,16 +140,15 @@ export class DiffTool implements JSONTool {
 
     if (a === null || b === null || typeof a !== 'object') {
       return {
-        type: 'changed',
         path,
+        type: 'changed',
         oldValue: a,
         newValue: b,
       };
     }
 
     if (Array.isArray(a) && Array.isArray(b)) {
-      const result: Record<string, unknown> = { type: 'array_diff', path, changes: [] };
-
+      const result = { path, type: 'array_diff', changes: [] as unknown[] };
       const maxLength = Math.max(a.length, b.length);
 
       for (let i = 0; i < maxLength; i++) {
@@ -179,13 +180,13 @@ export class DiffTool implements JSONTool {
     }
 
     if (isObject(a) && isObject(b)) {
-      const result: Record<string, unknown> = { type: 'object_diff', path, changes: [] };
-      const keys = new Set([...Object.keys(a as Record<string, JSONValue>), ...Object.keys(b as Record<string, JSONValue>)]);
+      const result = { path, type: 'object_diff', changes: [] as unknown[] };
+      const objA = a as Record<string, JSONValue>;
+      const objB = b as Record<string, JSONValue>;
+      const keys = new Set([...Object.keys(objA), ...Object.keys(objB)]);
 
       for (const key of keys) {
         const currentPath = path ? `${path}.${key}` : key;
-        const objA = a as Record<string, JSONValue>;
-        const objB = b as Record<string, JSONValue>;
 
         if (!(key in objA)) {
           (result.changes as unknown[]).push({
@@ -210,8 +211,8 @@ export class DiffTool implements JSONTool {
     }
 
     return {
-      type: 'changed',
       path,
+      type: 'changed',
       oldValue: a,
       newValue: b,
     };

@@ -29,10 +29,11 @@ export class MaskFieldsTool implements JSONTool {
     }
 
     if (isObject(value)) {
+      const objValue = value as Record<string, JSONValue>;
       const result: Record<string, JSONValue> = {};
 
-      for (const key of Object.keys(value)) {
-        const item = value[key];
+      for (const key of Object.keys(objValue)) {
+        const item = objValue[key];
 
         if (this.isSensitiveKey(key)) {
           result[key] = this.maskSensitiveValue(item as string);
@@ -131,7 +132,7 @@ export class MaskFieldsTool implements JSONTool {
   }
 
   private isIdCard(value: string): boolean {
-    return /^\d{15}$|^\d{18}$/.test(value);
+    return /^\d{15}$/.test(value) || /^\d{18}$/.test(value);
   }
 
   private maskIdCard(idCard: string): string {
@@ -182,14 +183,15 @@ export class DeleteFieldsTool implements JSONTool {
     }
 
     if (isObject(value)) {
+      const objValue = value as Record<string, JSONValue>;
       const result: Record<string, JSONValue> = {};
 
-      for (const key of Object.keys(value)) {
+      for (const key of Object.keys(objValue)) {
         if (fieldsToDelete.includes(key)) {
           continue;
         }
 
-        const item = value[key];
+        const item = objValue[key];
 
         if (isObject(item) || Array.isArray(item)) {
           result[key] = this.deleteFields(item, fieldsToDelete);

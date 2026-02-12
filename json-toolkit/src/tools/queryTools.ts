@@ -40,8 +40,9 @@ export class JsonPathTool implements JSONTool {
           return null;
         }
       } else if (isObject(current)) {
-        if (part in current) {
-          current = current[part];
+        const currentObj = current as Record<string, JSONValue>;
+        if (part in currentObj) {
+          current = currentObj[part];
         } else {
           return null;
         }
@@ -92,17 +93,18 @@ export class SearchKeyTool implements JSONTool {
         matches.push(...this.searchKeys(value[i], keyword, currentPath));
       }
     } else if (isObject(value)) {
-      for (const key of Object.keys(value)) {
+      const objValue = value as Record<string, JSONValue>;
+      for (const key of Object.keys(objValue)) {
         const currentPath = path ? `${path}.${key}` : key;
 
         if (key.toLowerCase().includes(keyword.toLowerCase())) {
           matches.push({
             path: currentPath,
-            value: value[key],
+            value: objValue[key],
           });
         }
 
-        matches.push(...this.searchKeys(value[key], keyword, currentPath));
+        matches.push(...this.searchKeys(objValue[key], keyword, currentPath));
       }
     }
 
@@ -154,9 +156,10 @@ export class SearchValueTool implements JSONTool {
         matches.push(...this.searchValues(value[i], keyword, currentPath));
       }
     } else if (isObject(value)) {
-      for (const key of Object.keys(value)) {
+      const objValue = value as Record<string, JSONValue>;
+      for (const key of Object.keys(objValue)) {
         const currentPath = path ? `${path}.${key}` : key;
-        matches.push(...this.searchValues(value[key], keyword, currentPath));
+        matches.push(...this.searchValues(objValue[key], keyword, currentPath));
       }
     }
 
