@@ -66,7 +66,12 @@ export class ToPythonTool implements JSONTool {
   }
 
   private toSnakeCase(str: string): string {
-    return str.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
+    return str.replace(/[A-Z]/g, (match, offset) => {
+      if (offset === 0) {
+        return match.toLowerCase();
+      }
+      return `_${match.toLowerCase()}`;
+    });
   }
 }
 
