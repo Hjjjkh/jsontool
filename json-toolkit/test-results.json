@@ -1,0 +1,107 @@
+[
+  {
+    "category": "basicTests",
+    "test": "format",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "basicTests",
+    "test": "minify",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "basicTests",
+    "test": "validate",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "basicTests",
+    "test": "invalidValidate",
+    "status": "✗ 预期错误"
+  },
+  {
+    "category": "basicTests",
+    "test": "sortKeys",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "basicTests",
+    "test": "sortKeysDesc",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "dataStructureTests",
+    "test": "flatten",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "dataStructureTests",
+    "test": "unflatten",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "dataStructureTests",
+    "test": "removeNull",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "dataStructureTests",
+    "test": "removeEmptyString",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "conversionTests",
+    "test": "toTypeScript",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "conversionTests",
+    "test": "toJava",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "conversionTests",
+    "test": "toGo",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "conversionTests",
+    "test": "toPython",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "conversionTests",
+    "test": "toSchema",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "queryTests",
+    "test": "jsonPath",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "queryTests",
+    "test": "jsonPathNested",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "queryTests",
+    "test": "searchKey",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "queryTests",
+    "test": "searchValue",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "securityTests",
+    "test": "maskFields",
+    "status": "✓ 需手动验证"
+  },
+  {
+    "category": "securityTests",
+    "test": "deleteFields",
+    "status": "✓ 需手动验证"
+  }
+]
