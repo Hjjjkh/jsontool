@@ -75,20 +75,23 @@ export class UnflattenTool implements JSONTool {
         const keys = key.split(separator);
         let current: Record<string, JSONValue> = result;
 
-        for (let i = 0; i < keys.length - 1; i++) {
+        for (let i = 0; i < keys.length; i++) {
           const k = keys[i];
 
           if (!(k in current) || current[k] === null || typeof current[k] !== 'object') {
             const nextKey = keys[i + 1];
-            const isArrayIndex = /^\d+$/.test(nextKey);
-            current[k] = isArrayIndex ? [] : {};
+            if (i < keys.length - 1) {
+              const isArrayIndex = /^\d+$/.test(nextKey);
+              current[k] = isArrayIndex ? [] : {};
+            } else {
+              current[k] = flat[key];
+            }
           }
 
           current = current[k] as Record<string, JSONValue>;
         }
 
-        const lastKey = keys[keys.length - 1];
-        current[lastKey] = flat[key];
+        current[keys[keys.length - 1]] = flat[key];
       }
     }
 

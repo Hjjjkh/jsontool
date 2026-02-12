@@ -93,7 +93,7 @@ export class SortKeysTool implements JSONTool {
       return value.map((item) => this.sortObjectKeys(item, order));
     }
 
-    const keys = Object.keys(value);
+    const keys = Object.keys(value).slice();
     const sorted: Record<string, JSONValue> = {};
 
     if (order === 'asc') {
