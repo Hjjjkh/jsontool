@@ -36,11 +36,9 @@ export class MaskFieldsTool implements JSONTool {
         const item = objValue[key];
 
         if (this.isSensitiveKey(key)) {
-          result[key] = this.maskSensitiveValue(item as string);
+          result[key] = typeof item === 'string' ? this.maskSensitiveValue(item) : item;
         } else if (isObject(item) || Array.isArray(item)) {
           result[key] = this.maskSensitiveFields(item);
-        } else if (typeof item === 'string') {
-          result[key] = this.maskSensitiveValue(item);
         } else {
           result[key] = item;
         }

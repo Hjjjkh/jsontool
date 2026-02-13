@@ -12,7 +12,7 @@ export class JsonPathTool implements JSONTool {
       const optionsObj = options as { path?: string } || {};
       const path = optionsObj.path;
 
-      if (!path) {
+      if (path === undefined) {
         return createErrorResult('请提供 path 参数');
       }
 
@@ -24,6 +24,10 @@ export class JsonPathTool implements JSONTool {
   }
 
   private queryByPath(value: JSONValue, path: string): JSONValue {
+    if (!path || path === '') {
+      return value;
+    }
+
     const pathParts = this.parsePath(path);
     let current = value;
 
@@ -33,7 +37,12 @@ export class JsonPathTool implements JSONTool {
       }
 
       if (Array.isArray(current)) {
-        const index = parseInt(part, 10);
+        let index = parseInt(part, 10);
+        
+        if (index < 0) {
+          index = current.length + index;
+        }
+        
         if (!isNaN(index) && index >= 0 && index < current.length) {
           current = current[index];
         } else {
@@ -55,7 +64,19 @@ export class JsonPathTool implements JSONTool {
   }
 
   private parsePath(path: string): string[] {
-    return path.split('.').filter((p) => p.length > 0);
+    const parts: string[] = [];
+    const regex = /([^.[]+)|\[([^\]]+)\]/g;
+    let match;
+
+    while ((match = regex.exec(path)) !== null) {
+      if (match[1]) {
+        parts.push(match[1]);
+      } else if (match[2]) {
+        parts.push(match[2]);
+      }
+    }
+
+    return parts;
   }
 }
 

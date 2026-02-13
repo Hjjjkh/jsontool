@@ -43,11 +43,20 @@ export class ToTypeScriptTool implements JSONTool {
 
     if (Array.isArray(value)) {
       if (value.length === 0) {
-        return 'any[]';
+        return 'unknown[]';
       }
 
-      const elementType = this.valueToTypeScriptType(value[0], 0);
-      return `${elementType}[]`;
+      const firstType = this.valueToTypeScriptType(value[0], 0);
+      const hasMixedTypes = value.some(item => {
+        const itemType = this.valueToTypeScriptType(item, 0);
+        return itemType !== firstType;
+      });
+
+      if (hasMixedTypes) {
+        return 'unknown[]';
+      }
+
+      return `${firstType}[]`;
     }
 
     if (isObject(value)) {
@@ -56,7 +65,12 @@ export class ToTypeScriptTool implements JSONTool {
 
       for (const key of Object.keys(objValue)) {
         const valueType = this.valueToTypeScriptType(objValue[key], indent + 1);
-        properties.push(`${spaces}${key}: ${valueType};`);
+
+        if (valueType.includes('\n')) {
+          properties.push(`${spaces}${key}: {\n${valueType}\n${spaces}};`);
+        } else {
+          properties.push(`${spaces}${key}: ${valueType};`);
+        }
       }
 
       if (properties.length === 0) {
@@ -102,7 +116,7 @@ export class ToJavaTool implements JSONTool {
 
     for (const key of Object.keys(objValue)) {
       const javaType = this.valueToJavaType(objValue[key]);
-      const fieldName = this.toCamelCase(key);
+      const fieldName = this.toSnakeCase(key);
       fields.push(`${spaces}private ${javaType} ${fieldName};`);
     }
 
@@ -133,7 +147,7 @@ export class ToJavaTool implements JSONTool {
     return 'Object';
   }
 
-  private toCamelCase(str: string): string {
+  private toSnakeCase(str: string): string {
     return str.replace(/([A-Z])/g, '_$1').toLowerCase();
   }
 }
@@ -178,7 +192,7 @@ export class ToGoTool implements JSONTool {
   }
 
   private valueToGoType(value: JSONValue): string {
-    if (value === null) return 'interface{}';
+    if (value === null) return 'any';
 
     if (typeof value === 'string') return 'string';
 
@@ -189,16 +203,16 @@ export class ToGoTool implements JSONTool {
     if (typeof value === 'boolean') return 'bool';
 
     if (Array.isArray(value)) {
-      if (value.length === 0) return '[]interface{}';
+      if (value.length === 0) return '[]any';
       const elementType = this.valueToGoType(value[0]);
       return `[]${elementType}`;
     }
 
     if (isObject(value)) {
-      return 'interface{}';
+      return 'any';
     }
 
-    return 'interface{}';
+    return 'any';
   }
 
   private toPascalCase(str: string): string {

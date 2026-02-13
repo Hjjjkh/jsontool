@@ -126,7 +126,11 @@ export class DiffTool implements JSONTool {
 
   private computeDiff(a: JSONValue, b: JSONValue, path: string = ''): Record<string, unknown> {
     if (deepEqual(a, b)) {
-      return { path, type: 'unchanged' };
+      return {
+        path,
+        type: 'no_changes',
+        value: a,
+      };
     }
 
     if (typeof a !== typeof b) {

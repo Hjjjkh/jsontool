@@ -26,14 +26,18 @@ export class FlattenTool implements JSONTool {
     }
 
     if (Array.isArray(value)) {
-      value.forEach((item, index) => {
-        const newKey = prefix ? `${prefix}[${index}]` : `[${index}]`;
-        if (isObject(item) || isArray(item)) {
-          Object.assign(result, this.flattenObject(item, separator, newKey));
-        } else {
-          result[newKey] = item;
-        }
-      });
+      if (value.length === 0) {
+        result[prefix] = [];
+      } else {
+        value.forEach((item, index) => {
+          const newKey = prefix ? `${prefix}[${index}]` : `[${index}]`;
+          if (isObject(item) || isArray(item)) {
+            Object.assign(result, this.flattenObject(item, separator, newKey));
+          } else {
+            result[newKey] = item;
+          }
+        });
+      }
       return result;
     }
 
@@ -72,30 +76,57 @@ export class UnflattenTool implements JSONTool {
 
     for (const key in flat) {
       if (Object.prototype.hasOwnProperty.call(flat, key)) {
-        const keys = key.split(separator);
-        let current: Record<string, JSONValue> = result;
+        const keys = this.parseFlatKey(key, separator);
+        let current: any = result;
 
         for (let i = 0; i < keys.length; i++) {
-          const k = keys[i];
+          const { key: k, isArrayIndex, index } = keys[i];
+          const nextKey = keys[i + 1];
 
-          if (!(k in current) || current[k] === null || typeof current[k] !== 'object') {
-            const nextKey = keys[i + 1];
-            if (i < keys.length - 1) {
-              const isArrayIndex = /^\d+$/.test(nextKey);
-              current[k] = isArrayIndex ? [] : {};
+          if (i === keys.length - 1) {
+            if (isArrayIndex && index !== undefined) {
+              current[index] = flat[key];
             } else {
               current[k] = flat[key];
             }
+          } else {
+            const nextIsArray = (nextKey && nextKey.isArrayIndex) || (nextKey && /^\d+$/.test(nextKey.key));
+
+            if (isArrayIndex && index !== undefined) {
+              if (current[index] === undefined || current[index] === null) {
+                current[index] = nextIsArray ? [] : {};
+              }
+              current = current[index];
+            } else {
+              if (current[k] === undefined || current[k] === null || typeof current[k] !== 'object') {
+                current[k] = nextIsArray ? [] : {};
+              }
+              current = current[k];
+            }
           }
-
-          current = current[k] as Record<string, JSONValue>;
         }
-
-        current[keys[keys.length - 1]] = flat[key];
       }
     }
 
     return result;
+  }
+
+  private parseFlatKey(key: string, separator: string): Array<{ key: string; isArrayIndex: boolean; index?: number }> {
+    const parts: Array<{ key: string; isArrayIndex: boolean; index?: number }> = [];
+    const segments = key.split(separator);
+
+    for (const segment of segments) {
+      const arrayMatch = segment.match(/^([^\[]+)\[(\d+)\]$/);
+
+      if (arrayMatch) {
+        parts.push({ key: arrayMatch[1], isArrayIndex: false });
+        parts.push({ key: arrayMatch[2], isArrayIndex: true, index: parseInt(arrayMatch[2], 10) });
+      } else {
+        parts.push({ key: segment, isArrayIndex: false });
+      }
+    }
+
+    return parts;
   }
 }
 

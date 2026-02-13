@@ -55,14 +55,23 @@ export class ValidateTool implements JSONTool {
   private parseError(error: unknown): { message: string } {
     if (error instanceof SyntaxError) {
       const message = error.message;
-      const match = message.match(/position (\d+)/);
+
+      const match = message.match(/position (\d+)/) ||
+                    message.match(/at position (\d+)/) ||
+                    message.match(/line (\d+)/);
+
       if (match) {
         const position = parseInt(match[1], 10);
         return {
           message: `JSON 语法错误: 位置 ${position}`,
         };
       }
+
+      return {
+        message: error.message,
+      };
     }
+
     return {
       message: error instanceof Error ? error.message : '未知错误',
     };

@@ -42,7 +42,7 @@ export class ToPythonTool implements JSONTool {
   }
 
   private valueToPythonType(value: JSONValue): string {
-    if (value === null) return 'Optional[Any] = None';
+    if (value === null) return 'Any | None = None';
 
     if (typeof value === 'string') return 'str';
 
