@@ -10,6 +10,7 @@ export const useToolExecution = () => {
   const [activeTool, setActiveTool] = useState<string>('format');
   const [errorState, setErrorState] = useState<ErrorInfo | null>(null);
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
+  const [autoExecute, setAutoExecute] = useState<boolean>(true);
 
   const executeTool = useCallback(
     async (toolType: string, options?: Record<string, unknown>) => {
@@ -51,7 +52,10 @@ export const useToolExecution = () => {
   const handleInputChange = useCallback((value: string) => {
     setInputJSON(value);
     setErrorState(null);
-  }, []);
+    if (autoExecute && value && value.trim()) {
+      executeTool(activeTool);
+    }
+  }, [autoExecute, activeTool, executeTool]);
 
   const clearOutput = useCallback(() => {
     setOutputResult('');
@@ -68,5 +72,7 @@ export const useToolExecution = () => {
     isExecuting,
     executeTool,
     clearOutput,
+    autoExecute,
+    setAutoExecute,
   };
 };

@@ -40,6 +40,7 @@ export class ValidateTool implements JSONTool {
 
   execute(input: string | JSONValue, options?: unknown): ToolResult {
     const jsonString = typeof input === 'string' ? input : JSON.stringify(input);
+    this.setLastInputString(jsonString);
 
     try {
       const parsed = JSON.parse(jsonString);
@@ -56,25 +57,85 @@ export class ValidateTool implements JSONTool {
     if (error instanceof SyntaxError) {
       const message = error.message;
 
-      const match = message.match(/position (\d+)/) ||
-                    message.match(/at position (\d+)/) ||
-                    message.match(/line (\d+)/);
+      const positionMatch = message.match(/position (\d+)/) ||
+                            message.match(/at position (\d+)/);
+      const lineMatch = message.match(/line (\d+)/);
 
-      if (match) {
-        const position = parseInt(match[1], 10);
+      if (positionMatch) {
+        const position = parseInt(positionMatch[1], 10);
+        const { line, column, context } = this.getErrorContext(message, position);
+        
+        let errorMsg = `JSON 语法错误（第 ${line} 行，第 ${column} 列）：\n\n`;
+        errorMsg += `${message}\n\n`;
+        errorMsg += `错误位置：\n${context}`;
+        
+        return { message: errorMsg };
+      }
+
+      if (lineMatch) {
+        const line = parseInt(lineMatch[1], 10);
         return {
-          message: `JSON 语法错误: 位置 ${position}`,
+          message: `JSON 语法错误（第 ${line} 行）：\n${message}`,
         };
       }
 
       return {
-        message: error.message,
+        message: `JSON 语法错误：\n${message}`,
       };
     }
 
     return {
       message: error instanceof Error ? error.message : '未知错误',
     };
+  }
+
+  private getErrorContext(errorMessage: string, position: number): { line: number; column: number; context: string } {
+    const inputString = this.getLastInputString();
+    if (!inputString) {
+      return { line: 1, column: position, context: `  位置 ${position}` };
+    }
+
+    const lines = inputString.split('\n');
+    let charCount = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const lineLength = lines[i].length + 1;
+      
+      if (charCount + lineLength > position) {
+        const lineNum = i + 1;
+        const columnNum = position - charCount + 1;
+        
+        const context = [];
+        const startLine = Math.max(0, i - 1);
+        const endLine = Math.min(lines.length - 1, i + 1);
+        
+        for (let j = startLine; j <= endLine; j++) {
+          const prefix = j === i ? '> ' : '  ';
+          context.push(`${prefix}${j + 1}: ${lines[j]}`);
+          
+          if (j === i) {
+            const spaces = String(j + 1).length + 3 + columnNum - 1;
+            context.push(`${' '.repeat(spaces)}^`);
+          }
+        }
+        
+        return { line: lineNum, column: columnNum, context: context.join('\n') };
+      }
+      
+      charCount += lineLength;
+    }
+
+    return { line: 1, column: position, context: `  位置 ${position}` };
+  }
+
+  private lastInputString = '';
+
+  private getLastInputString(): string {
+    return this.lastInputString;
+  }
+
+  public setLastInputString(input: string): void {
+    this.lastInputString = input;
   }
 }
 

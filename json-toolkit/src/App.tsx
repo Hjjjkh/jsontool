@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToolExecution } from './hooks/useToolExecution';
 import { Editor } from './components/Editor';
 import { ToolTabs } from './components/ToolTabs';
@@ -7,6 +7,16 @@ import { CopyButton } from './components/CopyButton';
 import { DownloadButton } from './components/DownloadButton';
 
 const App: React.FC = () => {
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
+
   const {
     inputJSON,
     setInputJSON,
@@ -17,15 +27,16 @@ const App: React.FC = () => {
     isExecuting,
     executeTool,
     clearOutput,
+    autoExecute,
+    setAutoExecute,
   } = useToolExecution();
 
   const handleToolChange = (tool: string) => {
     setActiveTool(tool);
     clearOutput();
-  };
-
-  const handleExecute = () => {
-    executeTool(activeTool as any);
+    if (inputJSON) {
+      executeTool(tool as any);
+    }
   };
 
   const handleClear = () => {
@@ -36,8 +47,30 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>JSON 工具站</h1>
-        <p className="subtitle">专业的 JSON 处理工具 - 格式化、压缩、转换、校验一站式解决方案</p>
+        <div className="header-content">
+          <div className="header-title">
+            <h1>JSON 工具站</h1>
+            <p className="subtitle">专业的 JSON 处理工具 - 格式化、压缩、转换、校验一站式解决方案</p>
+          </div>
+          <div className="header-actions">
+            <button
+              onClick={() => setAutoExecute(!autoExecute)}
+              className={`toggle-button ${autoExecute ? 'active' : ''}`}
+              type="button"
+              title="自动执行"
+            >
+              自动: {autoExecute ? '开' : '关'}
+            </button>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`theme-toggle ${darkMode ? 'dark' : 'light'}`}
+              type="button"
+              title="切换主题"
+            >
+              {darkMode ? '🌙' : '☀️'}
+            </button>
+          </div>
+        </div>
       </header>
 
       <main className="app-main">
@@ -63,15 +96,6 @@ const App: React.FC = () => {
             activeTool={activeTool as any}
             onToolChange={handleToolChange}
           />
-          <button
-            onClick={handleExecute}
-            disabled={isExecuting || !inputJSON}
-            className="execute-button"
-            type="button"
-            aria-live="polite"
-          >
-            {isExecuting ? '处理中...' : '执行'}
-          </button>
         </section>
 
         <section className="output-section" aria-labelledby="output-heading">
